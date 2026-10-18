@@ -1,0 +1,9 @@
+{
+  "name": "@obscura/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "dependencies": {"@noble/ed25519": "2.3.0", "@noble/hashes": "1.8.0"}
+}

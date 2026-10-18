@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.next/
+target/
+.env
+*.sqlite
+*.db
+wallet/
+*.seed
+*.key
+generated/
+.DS_Store
