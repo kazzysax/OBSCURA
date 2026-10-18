@@ -13,3 +13,5 @@ generated/
 data/
 *.sqlite-wal
 *.sqlite-shm
+next-env.d.ts
+*.tsbuildinfo
