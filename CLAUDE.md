@@ -38,14 +38,15 @@ Demo compresses a round into minutes; production rounds are daily.
 
 ```
 packages/
-  core/        types, memo codec, ZIP-321 builder, tally, first-price clearing, JCS + Ed25519 signatures, survival + tests
+  core/        types, UA decoding, memo codec, ZIP-321 builder, tally, first-price clearing, JCS + Ed25519 signatures, survival + tests
+  store/       SQLite via node:sqlite; shared by agent, detector and web
   detector/    scans lightwalletd/Zaino with the IVKs, parses obscura memos, emits vote/whisper/bid events
   artist/      the agent loop: reflect, concept, image generation, journal, round scheduling
   settlement/  computes refunds and asks the sidecar to send them
   web/         Next.js: gallery, live round with QR codes, auction, treasury/runway, journal, claim, badges
   mock/        mock chain that emits fake events (so UI and agent work isn't blocked by Zcash)
-sidecar/       wraps librustzcash or zingo-cli (decided by the spike) — new_address, send, scan_incoming, balance, tx_status
-docs/          PROTOCOL.md, PROGRESS.md, THREAT_MODEL.md, quickstart
+sidecar/       Rust HTTP API (tip, new_address, send, scan_incoming, balance); dev backend now, real backend (librustzcash or zingo-cli) after the spike
+docs/          PROTOCOL.md, PROGRESS.md, THREAT_MODEL.md, SPIKE.md
 ```
 
 ## Tech choices
@@ -57,7 +58,7 @@ docs/          PROTOCOL.md, PROGRESS.md, THREAT_MODEL.md, quickstart
 | Agent reasoning + journal | Claude API | any LLM behind one interface |
 | Image generation | One pluggable provider behind `generateImage()` | pre-rendered set for the demo |
 | Signatures | Ed25519 (`@noble/ed25519`), RFC 8785 canonical JSON | — |
-| Store | SQLite (`better-sqlite3`) | — |
+| Store | SQLite (`node:sqlite`, built into Node ≥ 22.13) | — |
 | Web | Next.js | — |
 | Tests | Vitest, `cargo test` | — |
 
@@ -72,6 +73,7 @@ docs/          PROTOCOL.md, PROGRESS.md, THREAT_MODEL.md, quickstart
 - Every tie-break ends in canonical order `(height, txid, output index)`.
 - Bound every agent decision with hard limits in config (min/max pieces, min/max reserve).
 - Build against `packages/mock` first; swap in the real detector when the spike works.
+- TypeScript runs via Node type stripping: no parameter properties, no enums (`erasableSyntaxOnly`).
 - Small commits; repo builds and tests pass after each. Update `docs/PROGRESS.md` when a step is done.
 - Ask before anything that spends mainnet funds.
 

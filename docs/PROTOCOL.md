@@ -95,7 +95,8 @@ Classification:
 Clearing:
 - Winner = highest valid value; ties broken by canonical order.
 - **Price = winner's bid.** The winner gets no refund.
-- Every other valid bid and every refundable invalid bid is refunded `value − REFUND_FEE_ZAT`, sent to its `refund_ua`. If `value ≤ REFUND_FEE_ZAT`, no refund is sent (donation).
+- Every other valid bid and every refundable invalid bid is refunded `value − REFUND_FEE_ZAT`, sent to its `refund_ua` with memo `obscura:v0:refund:<auction_id>:<reason>`. If `value ≤ REFUND_FEE_ZAT`, no refund is sent (donation).
+- Refunds are sent in batches of at most `REFUND_BATCH_SIZE` outputs per transaction, keyed by the bid's `(txid, output_index)` so each bid is refunded at most once.
 - Published: clearing price and number of valid bids. Individual losing bid amounts are never published.
 - No valid bids → piece stays in the artist's collection; may be re-auctioned later. Refundable bids are still refunded.
 
@@ -112,7 +113,7 @@ Why first-price: the operator can see bids live through the IVK. In a second-pri
   "price_zat": 0, "claim_pubkey": "...", "image_sha256": "...", "artist_sig": "<Ed25519 by artist key>" }
 ```
 
-**Possible upgrade: shielded collectible.** If a Zcash shielded asset / collectible standard is usable on mainnet before the deadline, the winner may also receive the piece as a real shielded token (supply 1) sent to their `refund_ua`, with `image_sha256` and the certificate hash bound to it. Status is checked during the spike (see PROGRESS.md). Until confirmed, the signed certificate above is the ownership record; it stays the canonical fallback either way.
+**Shielded collectible: not available.** The spike checked whether a Zcash shielded asset standard could carry the piece as a token. ZSAs (ZIPs 226/227) are still Draft and not part of NU7 (docs/SPIKE.md), so the signed certificate above is the ownership record. If ZSAs activate later, a one-of-one token bound to `image_sha256` can be added without changing anything else here.
 
 ## 5. Patron badges
 
