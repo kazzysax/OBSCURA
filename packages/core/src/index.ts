@@ -11,3 +11,4 @@ export * from "./survival.ts";
 export * from "./config.ts";
 export * from "./ids.ts";
 export * from "./testutil.ts";
+export * from "./chain.ts";

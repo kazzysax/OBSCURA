@@ -5,5 +5,5 @@
   "type": "module",
   "exports": { ".": "./src/index.ts" },
   "scripts": { "typecheck": "tsc -p tsconfig.json" },
-  "dependencies": {"@obscura/core": "workspace:*", "@obscura/store": "workspace:*", "@obscura/mock": "workspace:*", "@obscura/detector": "workspace:*", "@obscura/settlement": "workspace:*", "@anthropic-ai/sdk": "0.135.0"}
+  "dependencies": {"@obscura/core": "workspace:*", "@obscura/store": "workspace:*", "@obscura/mock": "workspace:*", "@obscura/detector": "workspace:*", "@obscura/settlement": "workspace:*", "@anthropic-ai/sdk": "0.135.0", "zod": "4.1.12"}
 }

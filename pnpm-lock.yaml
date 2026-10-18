@@ -22,7 +22,7 @@ importers:
     dependencies:
       '@anthropic-ai/sdk':
         specifier: 0.135.0
-        version: 0.135.0
+        version: 0.135.0(zod@4.1.12)
       '@obscura/core':
         specifier: workspace:*
         version: link:../core
@@ -38,6 +38,9 @@ importers:
       '@obscura/store':
         specifier: workspace:*
         version: link:../store
+      zod:
+        specifier: 4.1.12
+        version: 4.1.12
 
   packages/core:
     dependencies:
@@ -676,13 +679,18 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
+
 snapshots:
 
-  '@anthropic-ai/sdk@0.135.0':
+  '@anthropic-ai/sdk@0.135.0(zod@4.1.12)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       json-schema-to-ts: 3.1.1
       standardwebhooks: 1.1.1
+    optionalDependencies:
+      zod: 4.1.12
 
   '@babel/runtime@7.29.10': {}
 
@@ -1152,3 +1160,5 @@ snapshots:
     dependencies:
       siginfo: 2.0.0
       stackback: 0.0.2
+
+  zod@4.1.12: {}
