@@ -15,12 +15,17 @@ export function parseZec(s: string): Zat {
   return Number(m[1]) * ZAT_PER_ZEC + Number((m[2] ?? "").padEnd(8, "0"));
 }
 
+// btoa/atob exist in browsers and in Node ≥ 16, so this module runs in both.
 export function base64url(bytes: Uint8Array): string {
-  return Buffer.from(bytes).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 export function fromBase64url(s: string): Uint8Array {
-  return Uint8Array.from(Buffer.from(s.replace(/-/g, "+").replace(/_/g, "/"), "base64"));
+  const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b64 + "=".repeat((4 - (b64.length % 4)) % 4));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
 }
 
 // ZIP-321 qchar: unreserved / pct-encoded / "!$'()*,;:@" (no "&", "=", "+").

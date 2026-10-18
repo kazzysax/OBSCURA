@@ -1,11 +1,11 @@
 // Helpers shared by tests and the mock chain.
 import { encodeUa, TYPECODE } from "./ua.ts";
 import type { IncomingNote, Network } from "./types.ts";
-import { sha256Hex } from "./sign.ts";
+import { hexToBytes, sha256Hex } from "./sign.ts";
 
 /** A syntactically valid Orchard-only UA derived from a seed string (not spendable; for tests/mock only). */
 export function fakeOrchardUa(seed: string, network: Network = "testnet"): string {
-  const data = Uint8Array.from(Buffer.from(sha256Hex("ua:" + seed) + sha256Hex("ua2:" + seed), "hex").subarray(0, 43));
+  const data = hexToBytes(sha256Hex("ua:" + seed) + sha256Hex("ua2:" + seed)).subarray(0, 43);
   return encodeUa(network, [{ typecode: TYPECODE.orchard, data }]);
 }
 
