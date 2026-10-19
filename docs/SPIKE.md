@@ -51,7 +51,7 @@ Not decided yet: the rule is to verify, not guess, and neither path could be exe
   - (c) send with memo: `propose_transfer` (ZIP-317, Orchard change) → `create_proposed_transactions` (`LocalTxProver::bundled()`) → `SendTransaction`
   - (d) detect incoming + memos: `sync::run` with an in-memory `BlockCache`, then "enhancement" (`transaction_data_requests` → `GetTransaction` → `decrypt_and_store_transaction`, since compact blocks carry no memos), then read `v_tx_outputs`
   - (e) accounts: ZIP-32 account 0 = voting, 1 = auction (one account per round is a later step)
-- **Not yet exercised against a live server**: `init` reaches the TLS connect and fails with `transport error` because this environment's proxy refuses lightwalletd hosts. Nothing else is untested in principle, but expect first-run fixes.
+- **Not yet exercised against a live server**: `init` reaches the TLS connect and fails with `transport error` because this environment's proxy refuses lightwalletd hosts. None of the live paths (sync, enhancement, send) have run yet, so expect first-run fixes.
 
 ### Run it (on a machine that can reach testnet.zec.rocks)
 
