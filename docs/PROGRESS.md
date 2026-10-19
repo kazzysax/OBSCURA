@@ -6,6 +6,7 @@ Deadline: Oct 28, 2026 (Zecathon, Wildcard + Community Choice).
 - [x] 0. Scaffold: pnpm workspace, TS config, Vitest, Rust sidecar crate, .gitignore, .env.example, git init
 - [ ] 1. Spike: shielded send with memo from code + detect with IVK (decide librustzcash vs zingo-cli)
   - [x] Research: crate versions, NU7 timing, ZSA status (docs/SPIKE.md)
+  - [x] Backend decided (librustzcash, pre-release crates for NU7) and written: `sidecar/src/zcash.rs` compiles; `SIDECAR_BACKEND=zcash`, `obscura-sidecar init`
   - [ ] Live testnet send + detect — **blocked here**: the cloud environment's network policy rejects lightwalletd hosts. Run locally or allow the hosts.
 - [x] 2. `core`: memo codec (vote/whisper/bid), UA decoding (vs zcash-test-vectors), ZIP-321, tally, first-price clearing + refunds, JCS + signatures, survival, tests
 - [x] 3. `mock` + `web`: gallery, live round page with QR codes, live tallies, runway
@@ -48,4 +49,6 @@ _(none yet)_
 - 2026-10-18: TypeScript runs directly via Node type stripping (no build step for libraries); no TS parameter properties or enums.
 - 2026-10-18: Default image provider is a deterministic generative SVG renderer, so the demo runs with no API keys and image hashes are reproducible. Public previews are watermarked; the clean original is released only through a claim.
 - 2026-10-18: Refunds never auto-retry after an ambiguous failure (pending → sending → sent; failed needs `refunds-retry`). A stuck refund beats a double payment.
+- 2026-10-19: Staying on testnet for now (user decision). Sidecar backend = librustzcash on the pre-release crate line, because only it knows testnet's NU7 activation. Versions match zcash-devtool.
+- 2026-10-19: Memos come from enhancement (full-tx fetch + decrypt), not compact blocks; incoming notes are read from zcash_client_sqlite's `v_tx_outputs` view (not change, not self-sent).
 - 2026-10-18: Claude brain uses `claude-opus-5-5` with structured output and server-side refusal fallback (`fallbacks: "default"`); any error falls back to the offline brain.

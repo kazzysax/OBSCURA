@@ -10,10 +10,12 @@
 //!   POST /dev/pay       {to, value_zat, memo} -> {txid}
 //!   POST /dev/mine      {blocks}      -> {height}
 //!
-//! Binds to 127.0.0.1 only. The backend (librustzcash vs zingo-cli) is chosen by the spike;
-//! see docs/SPIKE.md. Until then `SIDECAR_BACKEND=dev` (the default) runs an in-memory chain.
+//! Binds to 127.0.0.1 only. Backends:
+//!   SIDECAR_BACKEND=dev    in-memory chain (default; for tests)
+//!   SIDECAR_BACKEND=zcash  real light wallet via lightwalletd (`obscura-sidecar init` first)
 
 mod backend;
+mod zcash;
 
 use backend::{Account, Backend, BackendError, DevBackend, Output};
 use serde::Deserialize;
@@ -93,16 +95,58 @@ fn route(req: &mut Request, backend: &mut dyn Backend) -> Result<Value, BackendE
     }
 }
 
+fn zcash_config() -> zcash::ZcashConfig {
+    let network = match std::env::var("ZCASH_NETWORK").as_deref() {
+        Ok("mainnet") => zcash_protocol::consensus::Network::MainNetwork,
+        _ => zcash_protocol::consensus::Network::TestNetwork,
+    };
+    let default_lwd = match network {
+        zcash_protocol::consensus::Network::MainNetwork => "https://zec.rocks:443",
+        zcash_protocol::consensus::Network::TestNetwork => "https://testnet.zec.rocks:443",
+    };
+    zcash::ZcashConfig {
+        wallet_dir: std::env::var("SIDECAR_WALLET_DIR").unwrap_or_else(|_| "./wallet".into()).into(),
+        network,
+        lightwalletd: std::env::var("LIGHTWALLETD_URL").ok().filter(|s| !s.is_empty()).unwrap_or_else(|| default_lwd.into()),
+    }
+}
+
 fn main() {
+    // tonic's TLS needs a process-wide rustls crypto provider.
+    let _ = rustls::crypto::ring::default_provider().install_default();
     let port = std::env::var("SIDECAR_PORT").unwrap_or_else(|_| "8402".into());
     let kind = std::env::var("SIDECAR_BACKEND").unwrap_or_else(|_| "dev".into());
-    if kind != "dev" {
-        eprintln!("obscura-sidecar: backend '{kind}' is not implemented yet (see docs/SPIKE.md); use SIDECAR_BACKEND=dev");
-        std::process::exit(2);
+    let args: Vec<String> = std::env::args().collect();
+
+    if args.get(1).map(String::as_str) == Some("init") {
+        let cfg = zcash_config();
+        if let Err(e) = zcash::init_wallet(&cfg) {
+            eprintln!("obscura-sidecar init: {e}");
+            std::process::exit(1);
+        }
+        return;
     }
-    let mut backend: Box<dyn Backend> = Box::new(DevBackend::new(1000));
+
+    let mut backend: Box<dyn Backend> = match kind.as_str() {
+        "dev" => Box::new(DevBackend::new(1000)),
+        "zcash" => {
+            let cfg = zcash_config();
+            eprintln!("obscura-sidecar: zcash backend, {} via {}", cfg.wallet_dir.display(), cfg.lightwalletd);
+            match zcash::ZcashBackend::open(cfg) {
+                Ok(b) => Box::new(b),
+                Err(e) => {
+                    eprintln!("obscura-sidecar: cannot open wallet ({e}); run `obscura-sidecar init` first");
+                    std::process::exit(2);
+                }
+            }
+        }
+        other => {
+            eprintln!("obscura-sidecar: unknown SIDECAR_BACKEND '{other}' (dev | zcash)");
+            std::process::exit(2);
+        }
+    };
     let server = Server::http(format!("127.0.0.1:{port}")).expect("bind sidecar port");
-    eprintln!("obscura-sidecar: dev backend listening on 127.0.0.1:{port}");
+    eprintln!("obscura-sidecar: {kind} backend listening on 127.0.0.1:{port}");
     let json_header = Header::from_bytes("content-type", "application/json").unwrap();
 
     for mut req in server.incoming_requests() {

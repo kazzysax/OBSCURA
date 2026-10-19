@@ -36,8 +36,7 @@ pub struct Output {
 pub enum BackendError {
     BadRequest(String),
     InsufficientFunds { have: u64, need: u64 },
-    /// For real backends (lightwalletd down, wallet syncing).
-    #[allow(dead_code)]
+    /// Real backend problems (lightwalletd down, wallet not synced).
     Unavailable(String),
 }
 

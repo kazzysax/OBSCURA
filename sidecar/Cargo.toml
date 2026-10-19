@@ -8,3 +8,23 @@ publish = false
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 tiny_http = "0.12.0"
+
+# Real Zcash backend. Pre-release line: only these know testnet's NU7 activation (docs/SPIKE.md).
+# Versions match zcash/zcash-devtool.
+async-trait = "0.1"
+hex = "0.4"
+rand = { version = "0.10", default-features = false, features = ["sys_rng", "thread_rng"] }
+rusqlite = "*"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }
+secrecy = "0.8"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tonic = { version = "0.14", features = ["tls-webpki-roots"] }
+uuid = { version = "1", features = ["serde"] }
+zcash_address = "=0.14.0-pre.2"
+zcash_client_backend = { version = "=0.25.0-pre.2", features = ["lightwalletd-tonic", "lightwalletd-tonic-tls-webpki-roots", "orchard", "sync"] }
+zcash_client_sqlite = { version = "=0.23.0-pre.2", features = ["orchard"] }
+zcash_keys = { version = "=0.17.0-pre.2", features = ["orchard"] }
+zcash_primitives = "=0.31.0-pre.2"
+zcash_proofs = { version = "=0.31.0-pre.2", features = ["bundled-prover"] }
+zcash_protocol = "=0.11.0-pre.1"
+zip321 = "=0.10.0-pre.2"
